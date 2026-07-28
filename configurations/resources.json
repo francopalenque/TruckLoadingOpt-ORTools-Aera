@@ -1,0 +1,4 @@
+{
+  "resource_request_ram": "1Gi",
+  "resource_limit_ram": "2Gi"
+}

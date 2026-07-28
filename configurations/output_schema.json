@@ -1,0 +1,24 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/truck-loading-opt-output.json",
+  "title": "TruckLoadingOpt Output Schema",
+  "description": "Output payload returned by the Hershey's Truck Loading Optimization Remote Function.",
+  "type": "object",
+  "required": [
+    "optimizer_status"
+  ],
+  "properties": {
+    "optimizer_status": {
+      "$id": "#root/optimizer_status",
+      "title": "optimizer_status",
+      "description": "Overall run result: 'Pass' if all DCs completed without exception, 'Fail' if an unhandled error occurred.",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "Pass"
+      ],
+      "pattern": "^.*$"
+    }
+  }
+}

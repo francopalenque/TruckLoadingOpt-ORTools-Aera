@@ -1,0 +1,132 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/truck-loading-opt-input.json",
+  "title": "TruckLoadingOpt Input Schema",
+  "description": "Input parameters for the Hershey's Truck Loading Optimization Remote Function.",
+  "type": "object",
+  "required": [
+    "project_id",
+    "plan_id",
+    "apo_truck_load",
+    "truck_capacity_details",
+    "dc_slot_schedule",
+    "general_configurations",
+    "delimiter",
+    "truncate_flag",
+    "sdk_workspace",
+    "sdk_destination_path"
+  ],
+  "properties": {
+    "project_id": {
+      "$id": "#root/project_id",
+      "title": "project_id",
+      "description": "AERA project UUID identifying the workspace context for data retrieval and output storage.",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "9224D9C4_BEB7_4065_869B_8E3B8F96DB63"
+      ],
+      "pattern": "^.*$"
+    },
+    "plan_id": {
+      "$id": "#root/plan_id",
+      "title": "plan_id",
+      "description": "Unique identifier for the planning run; namespaces input/output folders and log files.",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "9Sep"
+      ],
+      "pattern": "^.*$"
+    },
+    "apo_truck_load": {
+      "$id": "#root/apo_truck_load",
+      "title": "apo_truck_load",
+      "description": "API name of the APO Truck Load dataset in the AERA workspace; contains order-to-truck assignment candidates.",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "apotruckload"
+      ],
+      "pattern": "^.*$"
+    },
+    "truck_capacity_details": {
+      "$id": "#root/truck_capacity_details",
+      "title": "truck_capacity_details",
+      "description": "API name of the Truck Capacity Details dataset; defines truck types, capacities and utilization constraints.",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "truckloadutilization"
+      ],
+      "pattern": "^.*$"
+    },
+    "dc_slot_schedule": {
+      "$id": "#root/dc_slot_schedule",
+      "title": "dc_slot_schedule",
+      "description": "API name of the DC Slot Schedule dataset; defines available loading dock windows per distribution center.",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "dcslotschedule"
+      ],
+      "pattern": "^.*$"
+    },
+    "general_configurations": {
+      "$id": "#root/general_configurations",
+      "title": "general_configurations",
+      "description": "API name of the General Configurations dataset; contains solver flags and model configuration parameters.",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "generalconfigurations"
+      ],
+      "pattern": "^.*$"
+    },
+    "delimiter": {
+      "$id": "#root/delimiter",
+      "title": "delimiter",
+      "description": "Column delimiter character used when writing output CSV files to the AERA dataset.",
+      "type": "string",
+      "default": "",
+      "examples": [
+        ","
+      ],
+      "pattern": "^.*$"
+    },
+    "truncate_flag": {
+      "$id": "#root/truncate_flag",
+      "title": "truncate_flag",
+      "description": "If 'true', truncates destination AERA datasets before writing output; prevents duplicate rows across runs.",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "true"
+      ],
+      "pattern": "^.*$"
+    },
+    "sdk_workspace": {
+      "$id": "#root/sdk_workspace",
+      "title": "sdk_workspace",
+      "description": "Name of the AERA SDK workspace used for dataset uploads and downloads.",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "Logistics TLC"
+      ],
+      "pattern": "^.*$"
+    },
+    "sdk_destination_path": {
+      "$id": "#root/sdk_destination_path",
+      "title": "sdk_destination_path",
+      "description": "AERA SDK destination folder where output datasets are written after optimization.",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "Solver_Output"
+      ],
+      "pattern": "^.*$"
+    }
+  }
+}
