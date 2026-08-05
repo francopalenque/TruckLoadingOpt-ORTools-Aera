@@ -37,7 +37,7 @@ def upload_output(project_id, plan_id,dataset_handler, sdk_destination_path,outp
     upload_params = dict()
     upload_params["destination_path"] = sdk_destination_path
     upload_params["append_data"] = True
-    upload_params["truncate_flag"] = True if truncate_flag == 'true' else False
+    upload_params["truncate_flag"] = str(truncate_flag).lower() == 'true'
     for dataset_name, file in dataset_mapping.items():
         try:
             upload_params["dataset_name"] = dataset_name
@@ -60,7 +60,7 @@ def upload_logs(project_id, plan_id,dataset_handler, sdk_destination_path,log_pa
     upload_params = dict()
     upload_params["destination_path"] = sdk_destination_path
     upload_params["append_data"] = True
-    upload_params["truncate_flag"] = True if truncate_flag == 'true' else False
+    upload_params["truncate_flag"] = str(truncate_flag).lower() == 'true'
     for dataset_name, file in dataset_mapping.items():
         try:
             upload_params["dataset_name"] = dataset_name

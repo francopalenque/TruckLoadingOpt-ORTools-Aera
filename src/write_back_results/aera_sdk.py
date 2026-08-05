@@ -10,6 +10,10 @@ from src.write_back_results.utilities import CommonUtility
 import base64
 from src.common.logger_config import logger
 
+# Project that owns the DB connection used by AERA's truncate/delete processes.
+# Different from the request project_id (9224...) which only has SDK write access.
+SDK_PROJECT_ID = "47B0E24C_B5AD_4D14_9BDB_353980CCB973"
+
 
 class DatasetHandling:
     """
@@ -173,7 +177,7 @@ class DatasetHandling:
         meta_data = self.sdk_session.get_metadata(objectName=dataset_name, objectType="DATASET",workspaceName=self.workspace)
         table_name = meta_data["tableName"]
         process_params = {
-            "project_id": self.project_id,
+            "project_id": project_id,
             "object_name": table_name,
             "object_type": "DATASET"
         }
@@ -186,7 +190,7 @@ class DatasetHandling:
             processType="sync",
             processParams=process_params
         )
-
+        logger.info(f"Truncate response for {dataset_name}: {resp}")
         return resp
 
     def delete_data(self, project_id, plan_id, dataset_name,filters):
@@ -214,6 +218,7 @@ class DatasetHandling:
             processType="sync",
             processParams=process_params
         )
+        logger.info(f"Delete response for {dataset_name}: {resp}")
         return resp
 
 
@@ -380,7 +385,7 @@ def upload_data_sdk(project_id, plan_id, dataset_handler, upload_params, delimit
     if filters:
         dataset_handler.delete_data(project_id, plan_id, dataset_name,filters)
     if truncate_flag:
-        dataset_handler.truncate_dataset(project_id, plan_id, dataset_name)
+        dataset_handler.truncate_dataset(SDK_PROJECT_ID, plan_id, dataset_name)
     res = dataset_handler.create_dataset_from_file(name=dataset_name,
                                                    description=description,
                                                    destination_path=destination_path,

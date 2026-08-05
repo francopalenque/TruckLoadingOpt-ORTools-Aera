@@ -373,7 +373,12 @@ def assign_so_and_schedule_lines(merged_df, input_df):
     except Exception as e:
         logger.warning(f"Error in assign_so_and_schedule_lines: {e}")
         logger.warning(f"Result: {traceback.format_exc()}")
-        return merged_df
+        result = merged_df.copy()
+        _sid = result["scenario_id"].dropna()
+        if not _sid.empty:
+            result["scenario_id"] = result["scenario_id"].fillna(_sid.iloc[0])
+        result["po_number"] = result["po_number"].fillna(result["proposed_po"])
+        return result
 
 
 def aggregate_to_item_level(df, sum_cols, qty_input_col, qty_output_col):
