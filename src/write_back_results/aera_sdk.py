@@ -191,6 +191,13 @@ class DatasetHandling:
             processParams=process_params
         )
         logger.info(f"Truncate response for {dataset_name}: {resp}")
+        if resp and isinstance(resp, dict):
+            inner = resp.get("run_process") or {}
+            status = resp.get("status") or inner.get("status") or ""
+            if str(status).lower() == "failed":
+                raise RuntimeError(
+                    f"Truncate process returned Failed for {dataset_name}: {resp}"
+                )
         return resp
 
     def delete_data(self, project_id, plan_id, dataset_name,filters):

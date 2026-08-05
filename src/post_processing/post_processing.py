@@ -321,64 +321,67 @@ def create_and_reject_for_partial_updates(df):
 
 
 def assign_so_and_schedule_lines(merged_df, input_df):
-    try:
-
-        df = merged_df.copy()
-        # Always align sales_document to input_df
-        base_sales_doc = input_df["sales_document"].iloc[0]
-        # Track max SO item from input
-        max_so_item = input_df["sales_document_item"].astype(int).max()
-        # Process only rows that need to be created
-        create_mask = (df["output_flag"] == 1) & (df["input_flag"] == 0)
-        create_rows = df[create_mask]
-        if create_rows.empty:
-            return df
-
-        # Group by material to handle multiple rows per material
-        for (material, material_by_customer), group in create_rows.groupby(["material","materialbycustomer"]):
-
-            # material_subset = input_df[input_df["material"] == material]
-            material_subset = input_df[(input_df[
-                                            "material"] == material) & (input_df["materialbycustomer"] == material_by_customer)]  # & (input_df.get("input_flag", 0) == 1)] #we will not have input_flag in input_df
-
-            if not material_subset.empty:
-
-                # Material exists → reuse SO item
-
-                so_item = material_subset["sales_document_item"].iloc[0]
-                max_sched = material_subset["schedule_line"].astype(int).max()
-
-                # Assign new schedule lines incrementally
-
-                new_scheds = list(range(max_sched + 1, max_sched + 1 + len(group)))
-                new_scheds = [str(s) for s in new_scheds]
-                df.loc[group.index, "sales_document"] = base_sales_doc
-                df.loc[group.index, "sales_document_item"] = so_item
-                df.loc[group.index, "schedule_line"] = new_scheds
-                df.loc[group.index, ["input_flag", "output_flag"]] = [0, 1]
-
-            else:
-                # New material → assign new SO item
-                max_so_item += 10
-                so_item = str(max_so_item)
-                new_scheds = list(range(1, len(group) + 1))
-                new_scheds = [str(s) for s in new_scheds]
-                df.loc[group.index, "sales_document"] = base_sales_doc
-                df.loc[group.index, "sales_document_item"] = so_item
-                df.loc[group.index, "schedule_line"] = new_scheds
-                df.loc[group.index, ["input_flag", "output_flag"]] = [0, 1]
-
-        return df
-
-    except Exception as e:
-        logger.warning(f"Error in assign_so_and_schedule_lines: {e}")
-        logger.warning(f"Result: {traceback.format_exc()}")
+    # No existing orders for this dc/po in the input — cannot resolve a base
+    # sales_document, so return the merged frame unchanged and let the caller
+    # decide whether to keep or skip the result.
+    if input_df.empty:
+        logger.warning(
+            "assign_so_and_schedule_lines: input_df is empty — "
+            "no existing orders for this dc/po; returning merged_df unchanged"
+        )
         result = merged_df.copy()
         _sid = result["scenario_id"].dropna()
         if not _sid.empty:
             result["scenario_id"] = result["scenario_id"].fillna(_sid.iloc[0])
         result["po_number"] = result["po_number"].fillna(result["proposed_po"])
         return result
+
+    df = merged_df.copy()
+    # Always align sales_document to input_df
+    base_sales_doc = input_df["sales_document"].iloc[0]
+    # Track max SO item from input
+    max_so_item = input_df["sales_document_item"].astype(int).max()
+    # Process only rows that need to be created
+    create_mask = (df["output_flag"] == 1) & (df["input_flag"] == 0)
+    create_rows = df[create_mask]
+    if create_rows.empty:
+        return df
+
+    # Group by material to handle multiple rows per material
+    for (material, material_by_customer), group in create_rows.groupby(["material","materialbycustomer"]):
+
+        # material_subset = input_df[input_df["material"] == material]
+        material_subset = input_df[(input_df[
+                                        "material"] == material) & (input_df["materialbycustomer"] == material_by_customer)]  # & (input_df.get("input_flag", 0) == 1)] #we will not have input_flag in input_df
+
+        if not material_subset.empty:
+
+            # Material exists → reuse SO item
+
+            so_item = material_subset["sales_document_item"].iloc[0]
+            max_sched = material_subset["schedule_line"].astype(int).max()
+
+            # Assign new schedule lines incrementally
+
+            new_scheds = list(range(max_sched + 1, max_sched + 1 + len(group)))
+            new_scheds = [str(s) for s in new_scheds]
+            df.loc[group.index, "sales_document"] = base_sales_doc
+            df.loc[group.index, "sales_document_item"] = so_item
+            df.loc[group.index, "schedule_line"] = new_scheds
+            df.loc[group.index, ["input_flag", "output_flag"]] = [0, 1]
+
+        else:
+            # New material → assign new SO item
+            max_so_item += 10
+            so_item = str(max_so_item)
+            new_scheds = list(range(1, len(group) + 1))
+            new_scheds = [str(s) for s in new_scheds]
+            df.loc[group.index, "sales_document"] = base_sales_doc
+            df.loc[group.index, "sales_document_item"] = so_item
+            df.loc[group.index, "schedule_line"] = new_scheds
+            df.loc[group.index, ["input_flag", "output_flag"]] = [0, 1]
+
+    return df
 
 
 def aggregate_to_item_level(df, sum_cols, qty_input_col, qty_output_col):
